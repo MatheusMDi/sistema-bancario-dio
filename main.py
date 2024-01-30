@@ -1,12 +1,6 @@
+from datetime import datetime
+
 banco = 'Diniz National Bank (DNB)'
-menu = '''         Seja bem-vindo ao DNB!
-[S] Sacar
-[D] Depositar
-[E] Consultar extrato
-[Q] Sair
-
-Selecione uma operação: '''
-
 
 def realizar_saque(saldo, qtd_limite_saque, VALOR_LIMITE_SAQUE, historico_saques):
     valor_saque = int(input('Valor do saque: R$ '))
@@ -30,7 +24,6 @@ def realizar_saque(saldo, qtd_limite_saque, VALOR_LIMITE_SAQUE, historico_saques
     print('\nRetornando ao menu...')
     return saldo, qtd_limite_saque, historico_saques
 
-
 def realizar_deposito(saldo, historico_depositos):
     valor_deposito = int(input('Valor do depósito: R$ '))
 
@@ -44,7 +37,6 @@ def realizar_deposito(saldo, historico_depositos):
 
     print('\nRetornando ao menu...')
     return saldo, historico_depositos
-
 
 def consultar_extrato(banco, saldo, historico_saldos, historico_depositos, historico_saques, qtd_limite_saque):
     print(f'\n{banco:^41}'.upper())
@@ -72,6 +64,98 @@ def consultar_extrato(banco, saldo, historico_saldos, historico_depositos, histo
     print(f'Saldo atual da conta: R$ {saldo:.2f}')
     print(f'Saques diários restantes: {qtd_limite_saque}\n')
 
+class Usuario:
+    def __init__(self, nome, cpf, data_nascimento, endereco):
+        self.nome = nome
+        self.cpf = cpf
+        self.data_nascimento = data_nascimento
+        self.endereco = endereco
+        self.contas = []
+
+    def adicionar_conta(self, agencia, numero_conta):
+        conta = Conta(agencia, numero_conta, self)
+        self.contas.append(conta)
+
+    def __str__(self):
+        return f"Nome: {self.nome}\nCPF: {self.cpf}\nData de Nascimento: {self.data_nascimento}\nEndereço: {self.endereco}"
+
+class Conta:
+    def __init__(self, agencia, numero_conta, usuario):
+        self.agencia = agencia
+        self.numero_conta = numero_conta
+        self.usuario = usuario
+        self.saldo = 0.0
+
+    def __str__(self):
+        return f"Agência: {self.agencia}\nNúmero da Conta: {self.numero_conta}\nSaldo: R$ {self.saldo:.2f}\n{str(self.usuario)}"
+
+usuarios = []
+
+def criar_usuario():
+    nome = input("Nome: ")
+    cpf = input("CPF: ")
+
+    # Verificar se o CPF já está cadastrado
+    while any(usuario.cpf == cpf for usuario in usuarios):
+        print("CPF já cadastrado. Tente novamente.")
+        cpf = input("CPF: ")
+
+    data_nascimento = input("Data de Nascimento (DD/MM/AAAA): ")
+    endereco = input("Endereço: ")
+
+    # Converter a string da data de nascimento para um objeto datetime
+    data_nascimento = datetime.strptime(data_nascimento, "%d/%m/%Y").date()
+
+    usuario = Usuario(nome, cpf, data_nascimento, endereco)
+    usuarios.append(usuario)
+
+    print("\nUsuário criado com sucesso!\n")
+
+def criar_conta():
+    cpf = input("Digite o CPF do usuário para associar a conta: ")
+
+    # Procurar o usuário pelo CPF
+    usuario = next((u for u in usuarios if u.cpf == cpf), None)
+
+    if usuario:
+        agencia = input("Agência: ")
+        numero_conta = input("Número da Conta: ")
+
+        # Verificar se o número da conta já está em uso
+        while any(conta.numero_conta == numero_conta for conta in usuario.contas):
+            print("Número da conta já em uso. Tente novamente.")
+            numero_conta = input("Número da Conta: ")
+
+        usuario.adicionar_conta(agencia, numero_conta)
+        print("\nConta criada com sucesso!\n")
+    else:
+        print("\nUsuário não encontrado. Por favor, crie um usuário primeiro.\n")
+
+def listar_contas():
+    cpf = input("Digite o CPF do usuário para listar suas contas: ")
+
+    # Procurar o usuário pelo CPF
+    usuario = next((u for u in usuarios if u.cpf == cpf), None)
+
+    if usuario:
+        print(f"\nContas do usuário {usuario.nome} ({usuario.cpf}):\n")
+        for conta in usuario.contas:
+            print(conta)
+            print('-' * 30)
+    else:
+        print("\nUsuário não encontrado.\n")
+
+def exibir_menu():
+    return '''         Seja bem-vindo ao DNB!
+[S] Sacar
+[D] Depositar
+[E] Consultar extrato
+[C] Criar Usuário
+[CC] Criar Conta
+[LC] Listar Contas
+[Q] Sair
+
+Selecione uma operação: '''
 
 def main():
     opcao = 'Início'
@@ -87,7 +171,7 @@ def main():
         print('-' * 41)
         print(f'{banco:^41}'.upper())
         print('-' * 41)
-        opcao = str(input(menu)).upper()
+        opcao = str(input(exibir_menu())).upper()
         print('-' * 41)
 
         if opcao == 'S':
@@ -100,6 +184,15 @@ def main():
         elif opcao == 'E':
             consultar_extrato(banco, saldo, historico_saldos, historico_depositos, historico_saques, qtd_limite_saque)
 
+        elif opcao == 'C':
+            criar_usuario()
+
+        elif opcao == 'CC':
+            criar_conta()
+
+        elif opcao == 'LC':
+            listar_contas()
+
         elif opcao == 'Q':
             print('      O GNB agradece a preferência!')
             print()
@@ -108,7 +201,6 @@ def main():
         else:
             print('   Operação inválida. Tente novamente')
             print()
-
 
 if __name__ == "__main__":
     main()
