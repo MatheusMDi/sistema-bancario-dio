@@ -11,5 +11,12 @@ Possibilita aos usuários realizar depósitos em suas contas, contribuindo para 
 ## Extrato:
 Oferece a funcionalidade de consultar o extrato da conta, permitindo que os usuários visualizem suas transações recentes.
 
+## O Sistema evolui com novas funções:
+- Associação de contas a um usuario
+- Criação de multiplas contas associadas a um CPF
+- Listagem de contas geral e por cpf
+- Menu de acesso inicial(Crie ou acesse sua conta)
+
+
 Tecnologias Utilizadas
 Linguagem de Programação: Python
